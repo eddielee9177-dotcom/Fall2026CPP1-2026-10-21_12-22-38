@@ -47,7 +47,9 @@ public class PlayerController : MonoBehaviour
         }
 
         float moveX = Input.GetAxisRaw("Horizontal");
+        bool upPressed = Input.GetButtonDown("Vertical") && Input.GetAxisRaw("Vertical") > 0f;
         bool jumpPresssed = Input.GetButtonDown("Jump");
+        bool fireInput = Input.GetButtonDown("Fire1");
 
         rb.linearVelocityX = moveX * moveSpeed;
 
@@ -57,10 +59,20 @@ public class PlayerController : MonoBehaviour
             isGrounded = false;
         }
 
+        // Up Arrow while in the air = jump kick
+        if (upPressed && !isGrounded)
+        {
+            anim.SetTrigger("jumpAttack");
+        }
+
         if (moveX != 0f) SpriteFlip(moveX);
 
         anim.SetBool("isGrounded", isGrounded);
         anim.SetFloat("moveX", Mathf.Abs(moveX));
+        if (fireInput)
+        {
+            anim.SetTrigger("attack");
+        }
     }
 
     void SpriteFlip(float moveX) => sr.flipX = (moveX < 0f);
@@ -71,5 +83,3 @@ public class PlayerController : MonoBehaviour
     //    }
     //}
 }
-
-
