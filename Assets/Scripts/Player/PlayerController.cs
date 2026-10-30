@@ -7,13 +7,7 @@ public class PlayerController : MonoBehaviour
     #region Tunable Parameters
     public float moveSpeed = 5f;
     public float jumpForce = 5f;
-    #endregion
 
-    #region Ground Check
-    //public Transform groundCheckPos;
-    public LayerMask groundLayer;
-    public float groundCheckRadius = 0.2f;
-    private bool isGrounded;
     private Vector2 CalculateGroundCheckPos()
     {
         Bounds bounds = bc.bounds;
@@ -21,7 +15,11 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
-
+    #region Ground Check Parameters
+    public LayerMask groundLayer;
+    public float groundCheckRadius = 0.2f;
+    private bool isGrounded;
+    #endregion
     #region Component References
     private Rigidbody2D rb;
     private SpriteRenderer sr;
@@ -43,19 +41,14 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Check if the player is grounded only when falling or stationary
         if (rb.linearVelocityY <= 0f)
         {
             isGrounded = Physics2D.OverlapCircle(CalculateGroundCheckPos(), groundCheckRadius, groundLayer);
         }
 
-        //collect inputs for current frames
-        //bool upPressed = Input.GetAxisRaw("Vertical") > 0f;
         float moveX = Input.GetAxisRaw("Horizontal");
         bool jumpPresssed = Input.GetButtonDown("Jump");
 
-
-        //apply mechanics based on inputs
         rb.linearVelocityX = moveX * moveSpeed;
 
         if (jumpPresssed && isGrounded)
@@ -66,10 +59,8 @@ public class PlayerController : MonoBehaviour
 
         if (moveX != 0f) SpriteFlip(moveX);
 
-        // Update animator parameters
         anim.SetBool("isGrounded", isGrounded);
         anim.SetFloat("moveX", Mathf.Abs(moveX));
-
     }
 
     void SpriteFlip(float moveX) => sr.flipX = (moveX < 0f);
