@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
     #region Tunable Parameters
     public float moveSpeed = 5f;
     public float jumpForce = 5f;
+    public int maxLives = 9;
 
     private Vector2 CalculateGroundCheckPos()
     {
@@ -20,11 +21,54 @@ public class PlayerController : MonoBehaviour
     public float groundCheckRadius = 0.2f;
     private bool isGrounded;
     #endregion
+
     #region Component References
     private Rigidbody2D rb;
     private SpriteRenderer sr;
     private BoxCollider2D bc;
     private Animator anim;
+    private Shoot shoot;
+    #endregion
+
+    #region Lives and Score
+    private int _lives = 3;
+    public int lives
+    {
+        get { return _lives; }
+        set
+        {
+            if (value > maxLives)
+            {
+                _lives = maxLives;
+            }
+            else if (value < 0)
+            {
+                _lives = 0;
+            }
+            else
+            {
+                _lives = value;
+            }
+
+            Debug.Log($"Lives have changed to {_lives}");
+        }
+    }
+
+    private int _score = 0;
+    public int score
+    {
+        get { return _score; }
+        set
+        {
+            _score = Mathf.Max(0, value);
+            Debug.Log($"Score has changed to {_score}");
+        }
+    }
+    #endregion
+
+    #region Power-ups
+    //set to true when Mario picks up a Fire Flower - lets him shoot fireballs
+    public bool hasFirePower = false;
     #endregion
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -34,6 +78,7 @@ public class PlayerController : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
         bc = GetComponent<BoxCollider2D>();
         anim = GetComponent<Animator>();
+        shoot = GetComponent<Shoot>();
 
         rb.sleepMode = RigidbodySleepMode2D.NeverSleep;
     }
@@ -72,14 +117,13 @@ public class PlayerController : MonoBehaviour
         if (fireInput)
         {
             anim.SetTrigger("attack");
+
+            if (hasFirePower && shoot != null)
+            {
+                shoot.Fire();
+            }
         }
     }
 
     void SpriteFlip(float moveX) => sr.flipX = (moveX < 0f);
-    //{
-    //    if (sr.flipX && moveX > 0f || !sr.flipX && moveX< 0f)
-    //    {
-    //        sr.flipX = !sr.flipX;
-    //    }
-    //}
 }
